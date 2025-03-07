@@ -30,6 +30,8 @@ Mitosiz.Site.UserPurchases.Index.Controller = function () {
         txtStartDate: function () { return $('#txtStartDate'); },
         txtEndDate: function () { return $('#txtEndDate'); },
         txtUserName: function () { return $('#txtUserName'); },
+        txtUserId: function () { return $('#txtUserId'); },
+        txtPurchaseId: function () { return $('#txtPurchaseId'); },
         modalDetail: function () { return $('#modalDetail'); },
     };
     base.Event = {
@@ -52,11 +54,15 @@ Mitosiz.Site.UserPurchases.Index.Controller = function () {
         btnClearClick: function () {
             base.Function.ClearFilters();
             base.Parameters.currentPage = 1;
+            var purchaseId = base.Control.txtPurchaseId().val() != "" ? base.Control.txtPurchaseId().val() : 0;
+            var userId = base.Control.txtUserId().val() != "" ? base.Control.txtUserId().val() : 0;
             base.Ajax.AjaxGetPurchasesByWholesale.data = {
                 number: base.Parameters.currentPage,
                 size: base.Parameters.sizePagination,
                 storeId: base.Parameters.storeId,
                 names: base.Control.txtUserName().val(),
+                purchaseId: purchaseId,
+                userId: userId,
                 startDateString: base.Control.txtStartDate().val(),
                 endDateString: base.Control.txtEndDate().val()
             };
@@ -64,11 +70,15 @@ Mitosiz.Site.UserPurchases.Index.Controller = function () {
         },
         btnSearchClick: function () {
             base.Parameters.currentPage = 1;
+            var purchaseId = base.Control.txtPurchaseId().val() != "" ? base.Control.txtPurchaseId().val() : 0;
+            var userId = base.Control.txtUserId().val() != "" ? base.Control.txtUserId().val() : 0;
             base.Ajax.AjaxGetPurchasesByWholesale.data = {
                 number: base.Parameters.currentPage,
                 size: base.Parameters.sizePagination,
                 storeId: base.Parameters.storeId,
                 names: base.Control.txtUserName().val(),
+                purchaseId: purchaseId,
+                userId: userId,
                 startDateString: base.Control.txtStartDate().val(),
                 endDateString: base.Control.txtEndDate().val()
             };
@@ -122,10 +132,14 @@ Mitosiz.Site.UserPurchases.Index.Controller = function () {
             base.Ajax.AjaxGetLogin.submit();
         },
         GetUserPurchases: function () {
+            var purchaseId = base.Control.txtPurchaseId().val() != "" ? base.Control.txtPurchaseId().val() : 0;
+            var userId = base.Control.txtUserId().val() != "" ? base.Control.txtUserId().val() : 0;
             base.Ajax.AjaxGetPurchasesByWholesale.data = {
                 number: base.Parameters.currentPage,
                 size: base.Parameters.sizePagination,
                 storeId: base.Parameters.storeId,
+                purchaseId: purchaseId,
+                userId: userId,
                 names: base.Control.txtUserName().val(),
                 startDateString: base.Control.txtStartDate().val(),
                 endDateString: base.Control.txtEndDate().val()
@@ -236,6 +250,8 @@ Mitosiz.Site.UserPurchases.Index.Controller = function () {
             base.Control.txtStartDate().datepicker("setDate", new Date());
             base.Control.txtEndDate().datepicker("setDate", new Date());
             base.Control.txtUserName().val("");
+            base.Control.txtUserId().val("");
+            base.Control.txtPurchaseId().val("");
         },
         clsDetailPurchaseClick: function () {
             var parentElement = $(document);
