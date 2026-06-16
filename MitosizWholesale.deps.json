@@ -3068,7 +3068,10 @@
       },
       "Mitosiz.Entities/1.0.0": {
         "runtime": {
-          "Mitosiz.Entities.dll": {}
+          "Mitosiz.Entities.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         },
         "compile": {
           "Mitosiz.Entities.dll": {}
@@ -3080,7 +3083,10 @@
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
-          "Mitosiz.Logic.dll": {}
+          "Mitosiz.Logic.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         },
         "compile": {
           "Mitosiz.Logic.dll": {}
@@ -3088,7 +3094,10 @@
       },
       "Mitosiz.Utility/1.0.0": {
         "runtime": {
-          "Mitosiz.Utility.dll": {}
+          "Mitosiz.Utility.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         },
         "compile": {
           "Mitosiz.Utility.dll": {}

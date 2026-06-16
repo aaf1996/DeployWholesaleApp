@@ -99,11 +99,13 @@ Mitosiz.Site.Commission.Index.Controller = function () {
         },
         btnSaveClick: function () {
             var fileInput = $('#txtFile')[0].files[0];
+            const amountAvailable = parseFloat(base.Control.lblAmountAvailable().text()) || 0;
+            const amountRequested = parseFloat(base.Control.txtAmountToBeRequest().val()) || 0;
+
             if (base.Control.txtAmountToBeRequest().val() == "0" || base.Control.txtAmountToBeRequest().val() == "") {
                 Swal.fire("Oops...", "El monto solicitado es incorrecto", "error")
             }
-            else if (base.Control.lblAmountAvailable().text() == "0" || base.Control.lblAmountAvailable().text() == "" ||
-                    base.Control.lblAmountAvailable().text() < base.Control.txtAmountToBeRequest().val()) {
+            else if (amountAvailable === 0 || amountAvailable < amountRequested) {
                 Swal.fire("Oops...", "El monto solicitado es mayor a su comisión pendiente por cobrar", "error")
             }
             else if (base.Control.lblRUC().text() == "") {
