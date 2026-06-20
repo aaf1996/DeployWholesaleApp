@@ -8,12 +8,18 @@ Mitosiz.Site.Commission.Index.Controller = function () {
         base.Control.btnFilter().click(base.Event.btnFilterClick);
         base.Control.btnCommission().click(base.Event.btnCommissionClick);
         base.Control.btnSave().click(base.Event.btnSaveClick);
+        base.Control.btnSharedCommission().click(base.Event.btnSharedCommissionClick);
+        base.Control.btnBuscarUsuario().click(base.Event.btnBuscarUsuarioClick);
+        base.Control.btnCompartirCanje().click(base.Event.btnCompartirCanjeClick);
     };
     base.Parameters = {
         currentPage: 1,
         totalPages: 1,
         sizePagination: 10,
-        storeId: 0
+        storeId: 0,
+        storeName: "",
+        userIdModal: 0,
+        commissionToBeCollected: 0,
     };
     base.Control = {
         slcPeriod: function () { return $('#slcPeriod'); },
@@ -26,6 +32,7 @@ Mitosiz.Site.Commission.Index.Controller = function () {
         lblPendingCommission: function () { return $('#lblPendingCommission'); },
         btnCommission: function () { return $('#btnCommission'); },
         modalUpdate: function () { return $('#modalUpdate'); },
+        modalCompartirCanje: function () { return $('#modalCompartirCanje'); },
         btnSave: function () { return $('#btnSave'); },
         lblAmountAvailable: function () { return $('#lblAmountAvailable'); },
         lblRUC: function () { return $('#lblRUC'); },
@@ -36,12 +43,20 @@ Mitosiz.Site.Commission.Index.Controller = function () {
         txtAmountToBeRequest: function () { return $('#txtAmountToBeRequest'); },
         txtConcept: function () { return $('#txtConcept'); },
         txtFile: function () { return $('#txtConcept'); },
+        btnSharedCommission: function () { return $('#btnSharedCommission'); },
+        btnBuscarUsuario: function () { return $('#btnBuscarUsuario'); },
+        txtUserIdModal: function () { return $('#txtUserIdModal'); },
+        lblNombreEncontrado: function () { return $('#lblNombreEncontrado'); },
+        btnCompartirCanje: function () { return $('#btnCompartirCanje'); },
+        txtAmountShare: function () { return $('#txtAmountShare'); },
+        lblPendingPaymentCommission: function () { return $('#lblPendingPaymentCommission'); },
     };
     base.Event = {
         AjaxGetLoginSuccess: function (data) {
             if (data) {
                 if (data.isSuccess) {
                     base.Parameters.storeId = data.data.storeId;
+                    base.Parameters.storeName = data.data.storeName;
                     base.Function.GetMovementOfCommitteesWholesaleForUser();
                     base.Function.GetInformationWholesaleProfile();
                 }
@@ -88,6 +103,31 @@ Mitosiz.Site.Commission.Index.Controller = function () {
                     base.Control.lblCommissionCurrentPeriod().text(data.data.currentCommission);
                     base.Control.lblPendingCommission().text(data.data.commissionToBeCollected);
                     base.Control.lblAmountAvailable().text(data.data.commissionToBeCollected);
+                    base.Parameters.commissionToBeCollected = data.data.commissionToBeCollected;
+                }
+            }
+        },
+        AjaxGetUserNameByUserIdSuccess: function (data) {
+            if (data) {
+                if (data.isSuccess && data.data.isSuccess) {
+                    base.Control.lblNombreEncontrado().text(data.data.name);
+                    base.Parameters.userIdModal = base.Control.txtUserIdModal().val();
+                }
+                else {
+                    Swal.fire("Oops...", "Usuario no encontrado", "error")
+                }
+            }
+        },
+        AjaxShareMovementOfCommitteesWholesaleSuccess: function (data) {
+            if (data) {
+                if (data.isSuccess && data.data.isSuccess) {
+                    Swal.fire("Excelente !!", "Se ha compartido el Canje !!", "success")
+                    base.Control.modalCompartirCanje().modal('hide');
+                    base.Function.GetLogin();
+                    base.Ajax.AjaxGetComissionPeriodForComission.submit();
+                }
+                else {
+                    Swal.fire("Oops...", data.data.message ?? data.message, "error")
                 }
             }
         },
@@ -96,6 +136,38 @@ Mitosiz.Site.Commission.Index.Controller = function () {
         },
         btnCommissionClick: function () {
             base.Control.modalUpdate().modal('show');
+        },
+        btnSharedCommissionClick: function () {
+            base.Parameters.userIdModal = 0;
+            base.Control.txtUserIdModal().val("");
+            base.Control.lblNombreEncontrado().text("");
+            base.Control.txtAmountShare().val(0);
+            base.Control.lblPendingPaymentCommission().text(base.Parameters.commissionToBeCollected);
+            base.Control.modalCompartirCanje().modal('show');
+        },
+        btnBuscarUsuarioClick: function () {
+            base.Ajax.AjaxGetUserNameByUserId.data = {
+                userId: base.Control.txtUserIdModal().val(),
+            };
+            base.Ajax.AjaxGetUserNameByUserId.submit();
+        },
+        btnCompartirCanjeClick: function () {
+            if (base.Parameters.userIdModal == 0) {
+                Swal.fire("Oops...", "El usuario ingresado es inválido", "error");
+            }
+            else if (base.Control.txtAmountShare().val() == 0) {
+                Swal.fire("Oops...", "El monto ingresado es inválido", "error");
+            }
+            else {
+                base.Ajax.AjaxShareMovementOfCommitteesWholesale.data = {
+                    storeId: base.Parameters.storeId,
+                    storeName: base.Parameters.storeName,
+                    receivingUserId: base.Parameters.userIdModal,
+                    receivingUserName: base.Control.lblNombreEncontrado().text(),
+                    amount: base.Control.txtAmountShare().val(),
+                };
+                base.Ajax.AjaxShareMovementOfCommitteesWholesale.submit();
+            }
         },
         btnSaveClick: function () {
             var fileInput = $('#txtFile')[0].files[0];
@@ -191,6 +263,16 @@ Mitosiz.Site.Commission.Index.Controller = function () {
             action: Mitosiz.Site.Commission.Actions.GetInformationWholesaleProfile,
             autoSubmit: false,
             onSuccess: base.Event.AjaxGetInformationWholesaleProfileSuccess
+        }),
+        AjaxGetUserNameByUserId: new Mitosiz.Site.UI.Web.Components.Ajax({
+            action: Mitosiz.Site.Commission.Actions.GetUserNameByUserId,
+            autoSubmit: false,
+            onSuccess: base.Event.AjaxGetUserNameByUserIdSuccess
+        }),
+        AjaxShareMovementOfCommitteesWholesale: new Mitosiz.Site.UI.Web.Components.Ajax({
+            action: Mitosiz.Site.Commission.Actions.ShareMovementOfCommitteesWholesale,
+            autoSubmit: false,
+            onSuccess: base.Event.AjaxShareMovementOfCommitteesWholesaleSuccess
         }),
     };
     base.Function = {
